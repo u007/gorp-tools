@@ -13,11 +13,12 @@ import (
 )
 
 var config_file      = "conf/db.conf"
-var config, err      = go_config.NewConfigLoader("ini", config_file)
+var config           *go_config.IniConfigLoader
 var mode        		 = revel.RunMode
 var local_zone, local_offset = GetTimeZone()
 var time_zone   		 = local_zone //revel.Config.StringDefault("time_zone", local_zone)
 var DBMap 							 gorp.DbMap
+
 func GetTimeZone() (name string, offset int) {
 	return time.Now().In(time.Local).Zone()
 }
@@ -27,10 +28,16 @@ func DatabaseDriver() (string) {
 }
 
 func DatabaseConnectionString() (string, error) {
+	var err error
+	// super gotcha!!!!!! if you declared outside variable, using same name
+	//	locally with := is considered a different variable
+	config, err = go_config.NewConfigLoader("ini", config_file)
 	if (err != nil) {
     return "", err
   }
   needed := []string{"driver", "user", "host", "encoding", "db", "pass", "connection_pool"}
+	// Debug("user: %s", config.String(mode, "user", ""))
+	// Debug("driver: %s", config.String(mode, "driver", ""))
   if !CheckRequired(needed...){
     return "", fmt.Errorf("Required configuration missing: %s in %s", strings.Join(needed, ", "), config_file)
   }
