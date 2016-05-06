@@ -62,7 +62,7 @@ func InitDatabase() (*gorp.DbMap, error) {
 		return nil, err
 	}
 	driver := DatabaseDriver()
-	Debug("Driver: %s, Connection: %s", driver, connection_string)
+	// Debug("Driver: %s, Connection: %s", driver, connection_string)
 
 	if (driver == "mysql") {
 		db, err := sql.Open(driver,
@@ -73,9 +73,9 @@ func InitDatabase() (*gorp.DbMap, error) {
 			db.SetMaxOpenConns(connection_pool)
 		}
 
-		DBMap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{}}
+		DBMap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
 
-		defer db.Close()
+		// defer db.Close()
 		return DBMap, err
 	}
 
