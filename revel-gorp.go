@@ -17,7 +17,7 @@ var config           *go_config.IniConfigLoader
 var mode        		 = revel.RunMode
 var local_zone, local_offset = GetTimeZone()
 var time_zone   		 = local_zone //revel.Config.StringDefault("time_zone", local_zone)
-var DBMap 							 gorp.DbMap
+var DBMap 							 *gorp.DbMap
 
 func GetTimeZone() (name string, offset int) {
 	return time.Now().In(time.Local).Zone()
