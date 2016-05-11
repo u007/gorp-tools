@@ -71,7 +71,7 @@ func InitDatabase() (*gorp.DbMap, error) {
 		connection_pool := config.Int(mode, "connection_pool", 5)
 		if err == nil {
 			db.SetMaxIdleConns(0)
-		  db.SetMaxReuseTimeout(time.Minute)
+		  db.SetConnMaxLifetime(time.Minute)
 			db.SetMaxOpenConns(connection_pool)
 		}
 
