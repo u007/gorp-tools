@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/gorp.v1"
+	"github.com/jmoiron/sqlx" // gorp isnt good enough for fetching
 	"strings"
 	"net/url"
 	"fmt"
@@ -53,13 +54,13 @@ func DatabaseConnectionString() (string, error) {
 	return connection_string, nil
 }
 
-func InitDatabase() (*gorp.DbMap, error) {
+func InitDatabase() (*gorp.DbMap, *sqlx.DB, error) {
 	mode = revel.RunMode
 	time_zone = revel.Config.StringDefault("time_zone", local_zone)
 	Debug("Mode: %s, Time zone: %s, local timezone: %s, offset: %d", mode, time_zone, local_zone, local_offset)
 	connection_string, err  := DatabaseConnectionString()
 	if (err != nil) {
-		return nil, err
+		return nil, nil, err
 	}
 	driver := DatabaseDriver()
 	// Debug("Driver: %s, Connection: %s", driver, connection_string)
@@ -76,12 +77,13 @@ func InitDatabase() (*gorp.DbMap, error) {
 		}
 
 		DBMap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
+		SQLx  := sqlx.NewDb(db, driver)
 
 		// defer db.Close()
-		return DBMap, err
+		return DBMap, SQLx, err
 	}
 
-  return nil, fmt.Errorf("Unsurppoted Database driver %s", driver)
+  return nil, nil, fmt.Errorf("Unsurppoted Database driver %s", driver)
 }
 //
 // func LogValidationErrors(log_prefix string, valid *validation.Validation) {
